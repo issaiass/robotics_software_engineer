@@ -11,6 +11,8 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+include_directories(include)
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   # the following line skips the linter which checks for copyrights
@@ -22,5 +24,26 @@ if(BUILD_TESTING)
   set(ament_cmake_cpplint_FOUND TRUE)
   ament_lint_auto_find_test_dependencies()
 endif()
+
+# add the executable
+add_executable(assignment1 src/task1/assignment1.cpp src/task1/C3PO.cpp src/task1/R2D2.cpp)
+add_executable(assignment2 src/task2/assignment2.cpp src/task2/RobotTask2.cpp)
+add_executable(assignment3 src/task3/assignment3.cpp src/task3/RobotTask3.cpp)
+
+# link the libraries
+target_link_libraries(assignment1)
+target_link_libraries(assignment2)
+target_link_libraries(assignment3)
+
+ament_target_dependencies(assignment1)
+ament_target_dependencies(assignment2)
+ament_target_dependencies(assignment3)
+
+install(TARGETS
+  assignment1
+  assignment2
+  assignment3
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 ament_package()
