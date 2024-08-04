@@ -21,5 +21,6 @@
         "regex": "cpp",
         "*.tcc": "cpp",
         "ostream": "cpp"
-    }
+    },
+    "ros.distro": "humble"
 }
