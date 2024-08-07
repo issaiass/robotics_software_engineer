@@ -109,8 +109,8 @@ Below you will find this project tree
     ros2 launch module_2_assignment clear_turtlesim.launch.py
     # spawns 5 turtles
     ros2 launch module_2_assignment spawn_turtles.launch.py
-    # drive a turtle
-    ros2 launch module_2_assignment drive_turtle shape:=spiral a:=0.3 b:=0.4 
+    # drive a turtle, NOTE: Not all inputs are needed
+    ros2 launch module_2_assignment drive_turtle.launch.py shape:=spiral a:=0.3 b:=0.4 cmd_vel_topic:=/turtle2/cmd_vel pose_topic:=/turtle2/pose node_name:=turtle2_node linear:=0.4 turtlebot3_enabled:=false
 ```
 
 
