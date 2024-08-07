@@ -16,6 +16,8 @@ class TurtlesimCommander : public rclcpp::Node {
   public:
     TurtlesimCommander();
     bool initial_pose_received;
+    bool turtlebot3_enabled;
+
     void draw_n_point(int n, float linear_speed = 1.0, float linear_time = 2.0, float angular_speed = 0.2, int repetitions = 1);
     void draw_5_point_star(float linear_speed = 1.0, float linear_time = 2.0, float angular_speed = 0.2, int repetitions = 1);
     void draw_circle(float linear_speed = 1.0, float angular_speed = 0.2);

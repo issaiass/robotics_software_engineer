@@ -13,8 +13,16 @@ initial_pose_received(false)
     this->declare_parameter<float>("linear", 1.0);    
     this->declare_parameter<float>("a", 0.4);
     this->declare_parameter<float>("b", 0.3);
-    _publisher_cmd_vel = this->create_publisher<geometry_msgs::msg::Twist>("/turtle1/cmd_vel", 10);
-    _subscriber_pose = this->create_subscription<turtlesim::msg::Pose>("/turtle1/pose", 10, std::bind(&TurtlesimCommander::pose_callback, this, _1));
+
+    this->declare_parameter<string>("cmd_vel_topic", "/turtle1/cmd_vel");
+    this->declare_parameter<string>("pose_topic", "/turtle1/pose");    
+    this->declare_parameter<bool>("turtlebot3_enabled", false);        
+    string cmd_vel_topic, pose_topic;
+    this->get_parameter("cmd_vel_topic", cmd_vel_topic);
+    this->get_parameter("pose_topic", pose_topic);    
+    this->get_parameter("turtlebot3_enabled", turtlebot3_enabled);        
+    _publisher_cmd_vel = this->create_publisher<geometry_msgs::msg::Twist>(cmd_vel_topic, 10);
+    _subscriber_pose = this->create_subscription<turtlesim::msg::Pose>(pose_topic, 10, std::bind(&TurtlesimCommander::pose_callback, this, _1));
     _timer = this->create_wall_timer(_timer_period, std::bind(&TurtlesimCommander::timer_callback, this));
 }
 
@@ -84,6 +92,8 @@ void TurtlesimCommander::timer_callback() {
       }
     }
   }    
+  RCLCPP_INFO(this->get_logger(), "linear: '%.3f'", _tw.linear.x);  
+  RCLCPP_INFO(this->get_logger(), "angular: '%.3f'", _tw.angular.z);    
   _publisher_cmd_vel->publish(_tw);
 }
 
@@ -119,6 +129,7 @@ void TurtlesimCommander::draw_circle(float linear_speed, float angular_speed) {
     _tw.linear.x = linear_speed;
     _tw.angular.z = angular_speed;
     _publisher_cmd_vel->publish(_tw);
+    RCLCPP_INFO(this->get_logger(), "first time circle");  
 }
 
 void TurtlesimCommander::draw_log_spiral(float a, float b) {

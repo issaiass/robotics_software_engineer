@@ -7,13 +7,18 @@ int main(int argc, char * argv[])
 {
     rclcpp::init(argc, argv);
     auto turtle = std::make_shared<TurtlesimCommander>();
-    
-    while (!turtle->initial_pose_received && rclcpp::ok()) {
+
+//  Disable to test turtlebot3
+
+    if (!turtle->turtlebot3_enabled) {
+      while (!turtle->initial_pose_received && rclcpp::ok()) {
         rclcpp::spin_some(turtle);
+      }
     }
 
     string draw;
     turtle->get_parameter("shape", draw);
+    RCLCPP_INFO(turtle->get_logger(), "selected: '%s'", draw.c_str());  
     if (draw == "square") {
         turtle->draw_n_point(4, 1.0, 2.0, 0.2, 1);
     } 

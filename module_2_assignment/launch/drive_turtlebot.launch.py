@@ -10,21 +10,16 @@ def generate_launch_description():
         default_value='square',
         description='Paramter of possible shapes [square, triangle, star]'
     )
-
     linear = DeclareLaunchArgument(
         'linear',
         default_value='1.0',
         description='Paramter for circle radius'
     )
-
-
     a = DeclareLaunchArgument(
         'a',
         default_value='0.4',
         description='Paramter initial size of the spiral'
     )
-
-
     b = DeclareLaunchArgument(
         'b',
         default_value='0.3',
