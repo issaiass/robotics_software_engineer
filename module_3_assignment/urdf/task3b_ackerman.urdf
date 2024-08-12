@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<robot name="goofybot">
+
+    <link name="base">
+      <visual>
+        <geometry>
+          <box size="0.75 0.4 0.1"/>
+        </geometry>
+        <material name="gray">
+          <color rgba="0.2 0.2 0.2 1"/>
+        </material>
+      </visual>    
+    </link>
+
+    <link name="rear_wheel_right_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.15" length="0.1"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>       
+    </link>
+
+    <link name="rear_wheel_left_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.15" length="0.1"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>       
+    </link>
+
+
+    <link name="front_wheel_right_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.15" length="0.1"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>       
+    </link>
+
+    <link name="front_wheel_left_link">
+      <visual>
+        <geometry>
+          <cylinder radius="0.15" length="0.1"/>
+        </geometry>
+        <material name="white">
+          <color rgba="1 1 1 1"/>
+        </material>
+      </visual>       
+    </link>
+
+    <joint name="rear_wheel_right_joint" type="continuous">
+        <origin xyz="0.2 0.25 0" rpy="1.57 0 0"/>
+        <parent link="base"/>
+        <child link="rear_wheel_right_link"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <joint name="rear_wheel_left_joint" type="continuous">
+        <origin xyz="0.2 -0.25 0" rpy="1.57 0 0"/>
+        <parent link="base"/>
+        <child link="rear_wheel_left_link"/>
+        <axis xyz="0 0 1"/>
+    </joint>
+
+    <joint name="front_wheel_right_joint" type="revolute">
+        <origin xyz="-0.2 0.25 0" rpy="1.57 0 0"/>
+        <parent link="base"/>
+        <child link="front_wheel_right_link"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-0.5" upper="0.5" effort="100" velocity="1.0"/>        
+    </joint>
+
+    <joint name="front_wheel_left_joint" type="revolute">
+        <mimic joint="front_wheel_right_joint" multiplier="1" offset="0"/>    
+        <origin xyz="-0.2 -0.25 0" rpy="1.57 0 0"/>
+        <parent link="base"/>
+        <child link="front_wheel_left_link"/>
+        <axis xyz="0 1 0"/>
+        <limit lower="-0.5" upper="0.5" effort="100" velocity="1.0"/>        
+    </joint>    
+
+
+</robot>

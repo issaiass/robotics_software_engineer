@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<robot name="goofybot">
+
+  <link name="base_footprint"></link>
+  <link name="base_link"></link>
+  <link name="finger_link"></link>
+  <link name="ee_link"></link>    
+
+  <joint name="base_joint" type="continuous">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <joint name="finger_joint" type="continuous">
+    <origin xyz="0 0 1.5" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="finger_link"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <joint name="ee_joint" type="revolute">
+    <parent link="finger_link"/>
+    <child link="ee_link"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.57" upper="1.57" effort="100" velocity="1.0"/>
+  </joint>
+
+</robot>
