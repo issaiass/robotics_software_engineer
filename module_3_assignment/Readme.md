@@ -15,7 +15,7 @@
 <img src = "doc/task3a_mobile_arm.gif?raw=true" center=true width="55%"/>
 </p>
 
-### Assignment 3 - Task 3b: Build a Mobile Manipulator
+### Assignment 3 - Task 3b: Build a Mobile Robot with Ackerman Steering Drive
 <p align="center">
 <img src = "doc/task3b_ackerman.gif?raw=true" center=true width="55%"/>
 </p>
@@ -89,11 +89,11 @@ By completing this assignment, you will:
 - Next compile and source the repository
 ```sh
     cd ~/assignments_ws
-    colcon build --packages-select module_3_assigment
+    colcon build --packages-select module_3_assignment
     source install/setup.bash
 ```
 
-- Run the demos for Assignment 2, Part 1
+- Run the demos for Assignment 2, Part 1, 2, 3A and 3B
 ```sh
     ros2 launch module_3_assignment task:=task1
     ros2 launch module_3_assignment task:=task2
