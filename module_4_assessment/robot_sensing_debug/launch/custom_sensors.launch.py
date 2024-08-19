@@ -10,7 +10,7 @@ import os
 from launch.actions import ExecuteProcess
 
 def generate_launch_description():
-    pkgPath = get_package_share_directory('robot_sensing')
+    pkgPath = get_package_share_directory('robot_sensing_debug')
 
     urdfFile = os.path.join(pkgPath, 'urdf', 'diff_drive.urdf')
 

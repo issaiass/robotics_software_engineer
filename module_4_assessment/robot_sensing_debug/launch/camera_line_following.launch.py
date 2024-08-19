@@ -34,7 +34,7 @@ def generate_launch_description():
     y_pose = LaunchConfiguration('y_pose', default='2.07')
 
     world = os.path.join(
-        get_package_share_directory('robot_sensing'),
+        get_package_share_directory('robot_sensing_debug'),
         'worlds',
         'line_following.world'
     )
@@ -66,7 +66,7 @@ def generate_launch_description():
     )
 
     line_following = Node(
-        package = 'robot_sensing',
+        package = 'robot_sensing_debug',
         name = 'line_following',
         executable ='lineFollowing',
 

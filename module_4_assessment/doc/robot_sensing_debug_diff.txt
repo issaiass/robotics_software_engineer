@@ -1,0 +1,158 @@
+
+-# uncomment the following section in order to fill in
+-# further dependencies manually.
+-# find_package(<dependency> REQUIRED)
++find_package(rclcpp REQUIRED)
++#find_package(std_msgs REQUIRED)
++#find_package(cv_bridge REQUIRED)
++find_package(geometry_msgs REQUIRED)
++find_package(sensor_msgs REQUIRED)
++#find_package(OpenCV REQUIRED)
++#find_package(PCL REQUIRED)
++#find_package(pcl_conversions REQUIRED)
++
++include_directories(
++  include
++  ${rclcpp_INCLUDE_DIRS}
++)
++
+ 
++# add the executable and link the libraries
++add_executable(maze_solver src/maze_solver/scan_laser_data.cpp src/maze_solver/maze_solver.cpp )
++ament_target_dependencies(maze_solver rclcpp geometry_msgs sensor_msgs)
++target_link_libraries(maze_solver)
+
+
++install(TARGETS
++  maze_solver
++  DESTINATION lib/${PROJECT_NAME}
++)
+
+
++install(DIRECTORY 
++  launch
++  worlds
++  models
++  DESTINATION share/${PROJECT_NAME}
++)
++
+
++  <depend>rclcpp</depend>
++  <depend>geometry_msgs</depend>
++  <depend>sensor_msgs</depend>  
++  <depend>gazebo_ros</depend>
++
+
++     y_pose = LaunchConfiguration('y_pose', default='2.07')
+ 
+     world = os.path.join(
+-        get_package_share_directory('robot_sensing'),
++        get_package_share_directory('robot_sensing_debug'),
+         'worlds',
+         'line_following.world'
+     )
+
+     line_following = Node(
+-        package = 'robot_sensing',
++        package = 'robot_sensing_debug',
+
+ 
+
+-    pkgPath = get_package_share_directory('robot_sensing')
++    pkgPath = get_package_share_directory('robot_sensing_debug')
+ 
++    os.environ['TURTLEBOT3_MODEL'] = 'waffle_pi'
+
+-    x_pose = LaunchConfiguration('x_pose', default='8.980152')
++    x_pose = LaunchConfiguration('x_pose', default='-8.980152')
+
+-        get_package_share_directory('robot_sensing'),
++        get_package_share_directory('robot_sensing_debug'),
+
+-        'mazes.world'
++        'maze.world'
+     )
+ 
+
+     maze_solver = Node(
+-        package = 'robot_sensing',
++        package = 'robot_sensing_debug',
+
+
++#include <limits>
+ 
+
+-        "/laser_scan", 10,
++        "/scan", 10,
+ 
+
++    float max_ = std::numeric_limits<float>::max();
++    static bool status_ = false;
++
+
+
+-    RCLCPP_INFO(this->get_logger(), "Front: %f, Right: %f, Left: %f",
+-                frontObstacle, rightObstacle, leftObstacle);
++    RCLCPP_INFO(this->get_logger(), "Left: %.3f, Front: %.3f, Right: %.3f",
++                leftObstacle, frontObstacle, rightObstacle);
++
++    switch (state_) {
++    case RobotState::MOVING_STRAIGHT:
++      if (frontObstacle < frontThreshold_) {
++        if (leftObstacle < rightObstacle) {
++          state_ = RobotState::TURNING_RIGHT;
++        } 
++        if (rightObstacle < leftObstacle) {
++          state_ = RobotState::TURNING_LEFT;
++        }
++      }
++      break;
++    case RobotState::TURNING_LEFT:
++      if (frontObstacle > frontThreshold_) {
++        state_ = RobotState::MOVING_STRAIGHT;
++        status_ = true;
++      }
++      break;
++    case RobotState::TURNING_RIGHT:
++      if (frontObstacle > frontThreshold_) {
++        state_ = RobotState::MOVING_STRAIGHT;
++        status_ = true;
++      }
++      break;
++    case RobotState::OUT_OF_MAZE:
++        ;
++      break;
++    }
+ 
+-    if (frontObstacle < frontThreshold_ && rightObstacle < frontThreshold_ &&
+-        leftObstacle < frontThreshold_) {
++    if (frontObstacle > max_ && leftObstacle >  max_  && rightObstacle > max_ && status_) {
+       state_ = RobotState::OUT_OF_MAZE;
+-    } else if (frontObstacle > frontThreshold_) {
+-      state_ = leftObstacle > rightObstacle ? RobotState::TURNING_RIGHT
+-                                            : RobotState::TURNING_LEFT;
+-    }
+ 
+-      command.linear.y = linearVel_;
+-      command.angular.z = 0.5;
++      command.linear.x = linearVel_;
+
+
+-      command.linear.x = 0.5;
++      command.linear.x = 0.0;
+
+
+-      command.linear.x = 0.5;
++      command.linear.x = 0.0;
+
+-      command.linear.x = -linearVel_;
+-      command.angular.z = -0.5;
++      command.linear.x = 0.0;
++      command.angular.z = 0.0;
+
+-  float frontThreshold_ = 2.0f;
+-  float angularVel_ = 1.0f;
+-  float linearVel_ = 0.7f;
++  float frontThreshold_ = 1.5f;
++  float angularVel_ = 1.3f;
++  float linearVel_  = 0.5f;

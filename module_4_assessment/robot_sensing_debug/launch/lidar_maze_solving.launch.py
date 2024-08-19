@@ -26,17 +26,20 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
+    os.environ['TURTLEBOT3_MODEL'] = 'waffle_pi'
+
+    
     launch_file_dir = os.path.join(get_package_share_directory('turtlebot3_gazebo'), 'launch')
     pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
 
     use_sim_time = LaunchConfiguration('use_sim_time', default='true')
-    x_pose = LaunchConfiguration('x_pose', default='8.980152')
+    x_pose = LaunchConfiguration('x_pose', default='-8.980152')
     y_pose = LaunchConfiguration('y_pose', default='7.135622')
 
     world = os.path.join(
-        get_package_share_directory('robot_sensing'),
+        get_package_share_directory('robot_sensing_debug'),
         'worlds',
-        'mazes.world'
+        'maze.world'
     )
 
     gzserver_cmd = IncludeLaunchDescription(
@@ -70,7 +73,7 @@ def generate_launch_description():
     )
 
     maze_solver = Node(
-        package = 'robot_sensing',
+        package = 'robot_sensing_debug',
         name = 'maze_solvers',
         executable ='mazeSolving',
 
