@@ -227,7 +227,7 @@ Discuss which set of Q and R values provided the best balance between responsive
 ```sh
     ros2 launch module_5_assignment main_robotic_arm.launch.py
 ```
-- You can find also how to send commands via the terminal using [this bash script file for the gripper](docs/task3/act_gripper.sh) and [this other one for the joints](docs/task3/act_joints.sh).
+- You can find also how to send commands via the terminal using [this bash script file for the gripper](doc/task3/act_gripper.sh) and [this other one for the joints](doc/task3/act_joints.sh).
 
 - For Assignment 5, Part 4
 ```sh
