@@ -1,0 +1,441 @@
+<?xml version="1.0" ?>
+<robot name="goofybot">
+
+  <material name="blue">
+    <color rgba="0 0 0.8 1"/>
+  </material>
+  
+  <material name="black">
+    <color rgba="0 0 0 1"/>
+  </material>
+  
+  <material name="white">
+    <color rgba="1 1 1 1"/>
+  </material>
+
+  <!-- ARM -->  
+
+  <!--BASE FOOTPRINT -->
+  <link name="base_footprint">
+
+    <inertial>
+      <mass value="5" />
+        <inertia ixx="0.03047" ixy="0.0" ixz="0.0" iyy="0.03047" iyz="0.0" izz="0.05625" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0375"/>    
+      <geometry>
+        <cylinder radius="0.15" length="0.075"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0375"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.075"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <link name="base_link">
+    <inertial>
+      <mass value="3" />
+        <inertia ixx="0.01828" ixy="0.0" ixz="0.0" iyy="0.01828" iyz="0.0" izz="0.03375" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.0375"/>    
+      <geometry>
+        <cylinder radius="0.15" length="0.075"/>
+      </geometry>
+      <material name="white"/>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.0375"/>
+      <geometry>
+        <cylinder radius="0.15" length="0.075"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <!-- FINGER LINK -->
+  <link name="finger_link">
+    
+    <inertial>
+      <mass value="2" />
+        <inertia ixx="0.002" ixy="0.0" ixz="0.0" iyy="0.002" iyz="0.0" izz="0.002" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>        
+      <geometry>
+        <cylinder radius="0.05" length="0.5"/>
+      </geometry>
+      <material name="white"/>
+    </visual>  
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.5"/>
+      </geometry>
+    </collision>
+
+
+  </link>
+
+  <!-- EE LINK -->
+  <link name="ee_link">
+
+    <inertial>
+      <mass value="0.5" />
+        <inertia ixx="0.0002" ixy="0.0" ixz="0.0" iyy="0.0002" iyz="0.0" izz="0.0002" />
+    </inertial>
+    
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>  
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.005"/>
+      </geometry>
+    </collision>    
+
+  </link>    
+
+  <link name="gripper_base">
+    <inertial>
+      <mass value="0.5" />
+        <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0003" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.005"/>
+      </geometry>
+      <material name="white"/>
+    </visual>  
+
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.005"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <link name="gripper_extension">
+    <inertial>
+      <mass value="1" />
+        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+    </inertial>
+
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.5"/>
+      </geometry>
+      <material name="white"/>
+    </visual>  
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 -0.25"/>
+      <geometry>
+        <cylinder radius="0.05" length="0.5"/>
+      </geometry>
+    </collision>
+
+  </link>  
+
+  <joint name="base_joint" type="continuous">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <joint name="finger_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="finger_link"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+    <limit lower="-1.45" upper="1.45" effort="100" velocity="1.0"/>
+  </joint>
+
+  <joint name="ee_joint" type="revolute">
+    <parent link="finger_link"/>
+    <child link="ee_link"/>
+    <origin xyz="0 0 0.5" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-1.57" upper="1.57" effort="100" velocity="1.0"/>
+  </joint>
+  
+  <link name="gripper_tip_ee_right">
+
+    <inertial>
+      <mass value="0.1" />
+      <inertia ixx="9e-05" ixy="0.0" ixz="0.0" iyy="9e-05" iyz="0.0" izz="1e-05" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+    </collision>
+
+  </link>
+
+  <link name="gripper_tip_base">
+    
+    <inertial>
+      <mass value="0.3" />
+        <inertia ixx="0.0003" ixy="0.0" ixz="0.0" iyy="0.0003" iyz="0.0" izz="0.0003" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <sphere radius="0.05"/>
+      </geometry>
+    </collision>
+    
+  </link>
+
+  <link name="gripper_tip_ee_center">
+    
+    <inertial>
+      <mass value="0.1" />
+      <inertia ixx="9e-05" ixy="0.0" ixz="0.0" iyy="9e-05" iyz="0.0" izz="1e-05" />
+    </inertial>
+    
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>      
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+    </collision>
+
+  </link>   
+
+  <link name="gripper_tip_ee_left">
+
+    <inertial>
+      <mass value="0.1" />
+      <inertia ixx="9e-05" ixy="0.0" ixz="0.0" iyy="9e-05" iyz="0.0" izz="1e-05" />
+    </inertial>
+
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+      <material name="blue"/>
+    </visual>  
+
+    <collision>
+      <origin rpy="0 0 0" xyz="0 0 0.075"/>
+      <geometry>
+        <box size="0.02 0.02 0.1"/>
+      </geometry>
+    </collision>
+
+
+  </link>   
+
+  <!-- END ARM -->
+
+  <!-- GRIPPER -->
+
+  <joint name="gripper_joint" type="fixed">
+    <parent link="ee_link"/>
+    <child link="gripper_base"/>
+  </joint>
+
+  <joint name="gripper_extension_joint" type="prismatic">
+    <parent link="gripper_base"/>
+    <child link="gripper_extension"/>
+    <axis xyz="0 0 1"/>    
+    <limit effort="1000.0" upper="0.5" lower="0" velocity="0.5"/>
+  </joint>
+
+  <joint name="gripper_tip_base_joint" type="fixed">
+    <parent link="gripper_extension"/>
+    <child link="gripper_tip_base"/>
+    <origin rpy="0 0 0" xyz="0 0 0.0"/>    
+  </joint>
+
+<joint name="gripper_tip_ee_right_joint" type="revolute">
+  <parent link="gripper_tip_base"/>
+  <child link="gripper_tip_ee_right"/>
+  <origin xyz="0.025981 0.0015 0" rpy="0 0 2.09436"/>
+  <axis xyz="1 0 0"/>
+  <limit lower="-0.7853" upper="0.7853" effort="100" velocity="1.0"/>
+</joint>
+
+<joint name="gripper_tip_ee_center_joint" type="revolute">
+  <mimic joint="gripper_tip_ee_right_joint" multiplier="1" offset="0"/>    
+  <parent link="gripper_tip_base"/>
+  <child link="gripper_tip_ee_center"/>
+  <origin xyz="0 -0.03 0" rpy="0 0 0"/>
+  <axis xyz="1 0 0"/>
+  <limit lower="-0.7853" upper="0.7853" effort="100" velocity="1.0"/>
+</joint>
+
+<joint name="gripper_tip_ee_left_joint" type="revolute">
+  <mimic joint="gripper_tip_ee_right_joint" multiplier="1" offset="0"/>      
+  <parent link="gripper_tip_base"/>
+  <child link="gripper_tip_ee_left"/>
+  <origin xyz="-0.025981 0.0015 0" rpy="0 0 -2.09436"/>
+  <axis xyz="1 0 0"/>
+  <limit lower="-0.7853" upper="0.7853" effort="100" velocity="1.0"/>
+</joint>
+
+
+  <ros2_control name="GazeboSystem" type="system">
+
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+
+
+    <joint name="base_joint">
+      <command_interface name="position">
+        <param name="min">-5</param>
+        <param name="max">5</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+        <joint name="finger_joint">
+      <command_interface name="position">
+        <param name="min">-5</param>
+        <param name="max">5</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+        <joint name="ee_joint">
+      <command_interface name="position">
+        <param name="min">-5</param>
+        <param name="max">5</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+        <joint name="gripper_extension_joint">
+      <command_interface name="position">
+        <param name="min">-5</param>
+        <param name="max">5</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+        <joint name="gripper_tip_ee_right_joint">
+      <command_interface name="position">
+        <param name="min">-0.7853</param>
+        <param name="max">0.7853</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+
+        <joint name="gripper_tip_ee_left_joint">
+      <command_interface name="position">
+        <param name="min">-0.7853</param>
+        <param name="max">0.7853</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>    
+
+        <joint name="gripper_tip_ee_center_joint">
+      <command_interface name="position">
+        <param name="min">-0.7853</param>
+        <param name="max">0.7853</param>
+      </command_interface>
+      <state_interface name="position">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+      <state_interface name="velocity">
+        <param name="initial_value">0.0</param>
+      </state_interface>
+    </joint>
+
+  </ros2_control>
+
+  <gazebo>
+    <plugin filename="libgazebo_ros2_control.so" name="gazebo_ros2_control">
+      <parameters>/home/issaiass/assignments_ws/src/robotics_software_engineer/module_5_assignment/config/robotic_arm_controllers.yaml</parameters>
+    </plugin>
+  </gazebo>
+
+</robot>
