@@ -12,6 +12,7 @@
         "/home/issaiass/assignments_ws/src/robotics_software_engineer/module_3_assignment/include/**",
         "/home/issaiass/assignments_ws/src/robotics_software_engineer/module_4_assignment/include/**",
         "/home/issaiass/assignments_ws/src/robotics_software_engineer/module_5_assignment/include/**",
+        "/home/issaiass/assignments_ws/src/robotics_software_engineer/module_6_assignment/include/**",        
         "/usr/include/**"
       ],
       "name": "ROS",
