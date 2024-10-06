@@ -18,9 +18,16 @@ find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(visualization_msgs REQUIRED)
 find_package(tf2 REQUIRED)
+find_package(tf2_ros REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GeographicLib REQUIRED geographiclib)
+find_library(GeographicLib_LIBRARIES NAMES Geographic)
+if(NOT GeographicLib_LIBRARIES)
+    message(FATAL_ERROR "GeographicLib library not found")
+endif()
 
-
-include_directories(include)
+include_directories(include  ${GeographicLib_INCLUDE_DIRS})
+link_directories(${GeographicLib_LIBRARY_DIRS})
 
 # Extended Kalman Filter
 add_library(extended_kalman_filter_lib STATIC src/extended_kalman_filter/extended_kalman_filter.cpp)
@@ -43,9 +50,8 @@ endif()
 # Extended Kalman Filter
 add_executable(ekf_node src/extended_kalman_filter/ekf_node.cpp)
 target_include_directories(ekf_node PRIVATE include)
-target_link_libraries(ekf_node extended_kalman_filter_lib)
-ament_target_dependencies(ekf_node rclcpp sensor_msgs nav_msgs visualization_msgs geometry_msgs tf2)
-
+target_link_libraries(ekf_node extended_kalman_filter_lib ${GeographicLib_LIBRARIES})
+ament_target_dependencies(ekf_node rclcpp sensor_msgs nav_msgs visualization_msgs geometry_msgs tf2 tf2_ros)
 
 install(TARGETS 
   extended_kalman_filter_lib

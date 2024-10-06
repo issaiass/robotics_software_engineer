@@ -1,31 +1,34 @@
 #include "extended_kalman_filter/ekf_node.hpp"
 
-
 // IMU Readings: [omega, acceleration (z)]
 // GPS Readings: [x_gps, y_gps]
 // State Vector: [x, y, vx, vy, theta]
 // Measurements: [GPS_readings, IMU_readings]
 // The object being measured is a car
 
-ExtendedKalmanFilter_Node::ExtendedKalmanFilter_Node() : Node("ekf_node")
+ExtendedKalmanFilter_Node::ExtendedKalmanFilter_Node() : Node("ekf_node"), origin_set_(false)
 {
     setMatrices();
 
+    local_cartesian_converter_.Reset(origin_latitude, origin_longitude, origin_altitude);
+
     marker_publisher_ = this->create_publisher<visualization_msgs::msg::Marker>("visualization_marker", 10);
     odom_publisher_ = this->create_publisher<nav_msgs::msg::Odometry>("odometry/filtered", 10);
-    
+
     imuSub = this->create_subscription<sensor_msgs::msg::Imu>(
         "/imu", 10, std::bind(&ExtendedKalmanFilter_Node::imuCallback, this, std::placeholders::_1));
 
     odomSub = this->create_subscription<nav_msgs::msg::Odometry>(
-    "/odom", 10, std::bind(&ExtendedKalmanFilter_Node::odomCallback, this, std::placeholders::_1));
+        "/odom", 10, std::bind(&ExtendedKalmanFilter_Node::odomCallback, this, std::placeholders::_1));
+
+    gpsSub = this->create_subscription<sensor_msgs::msg::NavSatFix>(
+        "/gps/fix", 10, std::bind(&ExtendedKalmanFilter_Node::gpsCallback, this, std::placeholders::_1));
 
     // Create a timer to periodically call estimation()
     timer_ = this->create_wall_timer(
         std::chrono::milliseconds(static_cast<int>(ekf.dt * 1000)),
         std::bind(&ExtendedKalmanFilter_Node::timerCallback, this));
 }
-
 
 void ExtendedKalmanFilter_Node::odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg)
 {
@@ -37,28 +40,60 @@ void ExtendedKalmanFilter_Node::imuCallback(const sensor_msgs::msg::Imu::SharedP
     imu_msg = msg;
 }
 
+void ExtendedKalmanFilter_Node::gpsCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg)
+{
+    // if (msg->status.status == sensor_msgs::msg::NavSatStatus::STATUS_NO_FIX)
+    // {
+    //     RCLCPP_WARN(this->get_logger(), "No GPS fix available.");
+    //     return;
+    // }
+
+
+    gps_msg = msg;
+    if (!origin_set_)
+    {
+        // Set the origin based on the first valid GPS data
+        origin_latitude = msg->latitude;
+        origin_longitude = msg->longitude;
+        origin_altitude = msg->altitude; // Or set to 0.0 if altitude is not important
+        local_cartesian_converter_.Reset(origin_latitude, origin_longitude, origin_altitude);
+        origin_set_ = true;
+
+        RCLCPP_INFO(this->get_logger(), "Origin set to lat: %.6f, lon: %.6f, alt: %.2f", origin_latitude, origin_longitude, origin_altitude);
+    }
+
+    double x, y, z;
+    local_cartesian_converter_.Forward(msg->latitude, msg->longitude, msg->altitude, x, y, z);
+
+    current_x_ = x;
+    current_y_ = y;
+
+    // Use the x, y, z coordinates as needed
+    RCLCPP_INFO(this->get_logger(), "Local Coordinates -> x: %.3f, y: %.3f, z: %.3f", x, y, z);
+}
 
 void ExtendedKalmanFilter_Node::timerCallback()
 {
-    if (!imu_msg || !odom_msg)
+    if (!imu_msg || !odom_msg || !gps_msg)
     {
-        RCLCPP_WARN(this->get_logger(), "IMU message not received yet.");
+        RCLCPP_WARN(this->get_logger(), "IMU or ODOM or GPS messages not received yet.");
         return;
     }
 
     estimation();
 
-    double filtered_x   = ekf.x_pred_[0];
-    double filtered_y   = ekf.x_pred_[1];
-    double filtered_vx  = ekf.x_pred_[2];
-    double filtered_vy  = ekf.x_pred_[3];
+    double filtered_x = ekf.x_pred_[0];
+    double filtered_y = ekf.x_pred_[1];
+    double filtered_vx = ekf.x_pred_[2];
+    double filtered_vy = ekf.x_pred_[3];
     double filtered_yaw = ekf.x_pred_[4];
 
     publish_odom_marker(filtered_x, filtered_y);
     publish_odom_filtered(filtered_x, filtered_y, filtered_vx, filtered_vy, filtered_yaw);
 }
 
-void ExtendedKalmanFilter_Node::publish_odom_marker(double x, double y) {
+void ExtendedKalmanFilter_Node::publish_odom_marker(double x, double y)
+{
 
     visualization_msgs::msg::Marker marker;
     marker.header.frame_id = "odom";
@@ -85,13 +120,13 @@ void ExtendedKalmanFilter_Node::publish_odom_marker(double x, double y) {
     marker_publisher_->publish(marker);
 }
 
-
-void ExtendedKalmanFilter_Node::publish_odom_filtered(double x, double y, double vx, double vy, double angular_z)  {
-  // Create and publish the odometry message
+void ExtendedKalmanFilter_Node::publish_odom_filtered(double x, double y, double vx, double vy, double angular_z)
+{
+    // Create and publish the odometry message
     nav_msgs::msg::Odometry odom_msg_filtered;
     odom_msg_filtered.header.stamp = this->get_clock()->now();
-    odom_msg_filtered.header.frame_id = "odom";  // Set your appropriate frame
-    odom_msg_filtered.child_frame_id = "base_link";  // Set your appropriate child frame
+    odom_msg_filtered.header.frame_id = "odom";     // Set your appropriate frame
+    odom_msg_filtered.child_frame_id = "base_link"; // Set your appropriate child frame
 
     // Set the position
     odom_msg_filtered.pose.pose.position.x = x;
@@ -121,7 +156,7 @@ void ExtendedKalmanFilter_Node::publish_odom_filtered(double x, double y, double
     odom_msg_filtered.twist.twist.angular.z = angular_z;
 
     // Publish the odometry message
-    odom_publisher_->publish(odom_msg_filtered);    
+    odom_publisher_->publish(odom_msg_filtered);
 }
 
 void ExtendedKalmanFilter_Node::estimation()
@@ -131,7 +166,25 @@ void ExtendedKalmanFilter_Node::estimation()
     ekf.predict();
     RCLCPP_INFO(this->get_logger(), "Prediction step completed. State and covariance matrices have been predicted.");
 
-    measurements << odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, imu_msg->linear_acceleration.x, imu_msg->angular_velocity.z;
+
+    double x_gps = -current_x_;
+    double y_gps = -current_y_;
+
+    // IMU data for angular velocity and linear acceleration
+    double imu_omega = imu_msg->angular_velocity.z; // Yaw rate
+    double imu_a = imu_msg->linear_acceleration.x;  // Linear acceleration
+
+    // Update the measurement vector with GPS and IMU data
+    measurements << x_gps, y_gps, imu_a, imu_omega;
+
+    // odom data
+    // double x_odom = odom_msg->pose.pose.position.x;
+    // double y_odom = odom_msg->pose.pose.position.y;
+    // double vx_odom = odom_msg->twist.twist.linear.x;
+    // double vy_odom = odom_msg->twist.twist.linear.y;
+
+    //    measurements << odom_msg->pose.pose.position.x, odom_msg->pose.pose.position.y, imu_msg->linear_acceleration.x, imu_msg->angular_velocity.z;
+
     RCLCPP_INFO(this->get_logger(), "Measurements obtained from sensors: x = %f, y = %f, ax = %f, az = %f",
                 measurements[0], measurements[1], measurements[2], measurements[3]);
 
@@ -146,27 +199,26 @@ void ExtendedKalmanFilter_Node::setMatrices()
 
     x_in << 0.0, 0.0, 0.0, 0.0, 0.0; // [x, y, vx, vy, yaw]
 
+    // Covariance Matrix
     P_in << 1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, 1, 0,
-        0, 0, 0, 0, 1;
+            0, 1, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
     // State Transition Matrix
     F_in << 1, 0, 0, 0, 0,
-        0, 1, 0, 0, 0,
-        0, 0, 1, 0, 0,
-        0, 0, 0, 1, 0,
-        0, 0, 0, 0, 1;
+            0, 1, 0, 0, 0,
+            0, 0, 1, 0, 0,
+            0, 0, 0, 1, 0,
+            0, 0, 0, 0, 1;
     // Measurement Matrix
     H_in.setZero();
+
+
     // Measurement Noise Covariance Matrix
-    R_in.setZero();
+    R_in = R_in.setIdentity()*0.0;
     // Process Noise Covariance Matrix
-    Q_in << 0.1, 0, 0, 0, 0,
-        0, 0.1, 0, 0, 0,
-        0, 0, 0.1, 0, 0,
-        0, 0, 0, 0.1, 0,
-        0, 0, 0, 0, 0.1;
+    Q_in = Q_in.setIdentity()*0.1;
 
     ekf.dt = 0.1;
 

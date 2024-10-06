@@ -13,6 +13,8 @@
 #include <nav_msgs/msg/odometry.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
+#include <sensor_msgs/msg/nav_sat_fix.hpp>
+#include <GeographicLib/LocalCartesian.hpp>
 
 typedef Eigen::Matrix<double, 2, 1> Vector2d;
 typedef Eigen::Matrix<double, 4, 1> Vector4d;
@@ -22,44 +24,56 @@ typedef Eigen::Matrix<double, 5, 1> Vector5d;
 typedef Eigen::Matrix<double, 5, 5> Matrix5d;
 typedef Eigen::Matrix<double, 2, 5> Matrix25d;
 
-class ExtendedKalmanFilter_Node : public rclcpp::Node {
-  public:
-    ExtendedKalmanFilter_Node();
-  private:
-    void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
-    void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
-    void timerCallback();    
-    void estimation();
-    void setMatrices();
-    void publish_odom_marker(double x, double y);
-    void publish_odom_filtered(double x, double y, double vx, double vy, double angular_z);    
-    Vector5d x_in;
-    Matrix5d P_in;
-    Matrix5d F_in;
-    Matrix45d H_in;
-    Matrix4d R_in;
-    Matrix5d Q_in;
+class ExtendedKalmanFilter_Node : public rclcpp::Node
+{
+public:
+  ExtendedKalmanFilter_Node();
 
-    Vector4d measurements;
+private:
+  void imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg);
+  void odomCallback(const nav_msgs::msg::Odometry::SharedPtr msg);
+  void gpsCallback(const sensor_msgs::msg::NavSatFix::SharedPtr msg);
+  void timerCallback();
+  void estimation();
+  void setMatrices();
+  void publish_odom_marker(double x, double y);
+  void publish_odom_filtered(double x, double y, double vx, double vy, double angular_z);
 
-    // The following values are the covariances for the GPS and IMU sensors taken from the KITTI data.
-    double cov_imu = 0.012727922061358;
-    double cov_gps = 0.028452340807104;
+  Vector5d x_in;
+  Matrix5d P_in;
+  Matrix5d F_in;
+  Matrix45d H_in;
+  Matrix4d R_in;
+  Matrix5d Q_in;
 
-    ExtendedKalmanFilter ekf;
-    sensor_msgs::msg::Imu::SharedPtr imu_msg;
-    nav_msgs::msg::Odometry::SharedPtr odom_msg;
+  Vector4d measurements;
 
+  double origin_latitude;
+  double origin_longitude;
+  double origin_altitude;
+  bool origin_set_;
+  
+  double current_x_;
+  double current_y_;
 
+  // The following values are the covariances for the GPS and IMU sensors taken from the KITTI data.
+  double cov_imu = 0.012727922061358;
+  double cov_gps = 0.028452340807104;
 
-    rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr markerArraySub;
-    rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imuSub;
-    rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
+  ExtendedKalmanFilter ekf;
+  sensor_msgs::msg::Imu::SharedPtr imu_msg;
+  nav_msgs::msg::Odometry::SharedPtr odom_msg;
+  sensor_msgs::msg::NavSatFix::SharedPtr gps_msg;
 
-    rclcpp::TimerBase::SharedPtr timer_;  // Timer for periodic estimation
-    rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_publisher_;
-    rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;    
+  rclcpp::Subscription<visualization_msgs::msg::MarkerArray>::SharedPtr markerArraySub;
+  rclcpp::Subscription<sensor_msgs::msg::Imu>::SharedPtr imuSub;
+  rclcpp::Subscription<nav_msgs::msg::Odometry>::SharedPtr odomSub;
+  rclcpp::Subscription<sensor_msgs::msg::NavSatFix>::SharedPtr gpsSub;
 
+  rclcpp::TimerBase::SharedPtr timer_; // Timer for periodic estimation
+  rclcpp::Publisher<visualization_msgs::msg::Marker>::SharedPtr marker_publisher_;
+  rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odom_publisher_;
+  GeographicLib::LocalCartesian local_cartesian_converter_;
 };
 
 #endif
