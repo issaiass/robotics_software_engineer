@@ -222,16 +222,11 @@ Experiment with Different Q and R Values:
 ```sh 
     git clone https://github.com/Robotisim/robotics_software_engineer.git
 ```
-- Next compile first the module_4_assignmet repository
-```sh
-    cd ~/assignments_ws
-    colcon build --packages-select module_4_assignment
-```
 
-- Later compile the module_5_assignmet repository and source it
+- Later compile the module_6_assignmet repository and source it
 ```sh
     cd ~/assignments_ws
-    colcon build --packages-select module_5_assignment
+    colcon build --packages-select module_6_assignment
     source install/setup.bash
 ```
 
@@ -253,9 +248,9 @@ Experiment with Different Q and R Values:
 <details open>
 <summary> <b>Results <b></summary>
 
-#### Task 1: Improve Camera-Based Line Following
+#### Extended Kalman Filter Video
 
-[<img src= "https://img.youtube.com/vi/O12xLjQX3pM/0.jpg" />](https://youtu.be/O12xLjQX3pM)
+[<img src= "https://img.youtube.com/vi/vFNr7DC0EDw/0.jpg" />](https://youtu.be/vFNr7DC0EDw)
 
 
 </details>
@@ -264,7 +259,7 @@ Experiment with Different Q and R Values:
 <details open>
 <summary> <b>Issues<b></summary>
 
-#### Line Following
+#### Extended Kalman Filter
 
 - If you want to use the robot_localization package will not work of-the-shelf on this demo, you have to feed the odom instead of the gps.
 - Only tested for waffle_gps model.
