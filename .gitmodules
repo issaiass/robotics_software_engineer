@@ -1,0 +1,9 @@
+[submodule "turtlebot3_simulations"]
+	path = turtlebot3_simulations
+	url = https://github.com/robotis-git/turtlebot3_simulations.git
+	branch = humble-devel
+
+[submodule "slam_gmapping"]
+	path = slam_gmapping
+	url = https://github.com/Project-MANAS/slam_gmapping.git
+	branch = eloquent-devel
