@@ -29,6 +29,11 @@ add_library(rrt STATIC src/algo/rrt.cpp)
 ament_target_dependencies(rrt rclcpp nav_msgs geometry_msgs)
 target_link_libraries(rrt node_lib)
 
+# RRTA* Library
+add_library(rrt_a_star STATIC src/algo/rrt_a_star.cpp)
+ament_target_dependencies(rrt_a_star rclcpp nav_msgs geometry_msgs)
+target_link_libraries(rrt_a_star node_lib a_star rrt)
+
 # Occupancy Grid Node
 add_executable(occupancy_grid_node src/occupancy_grid/occupancy_grid.cpp src/occupancy_grid_node.cpp)
 ament_target_dependencies(occupancy_grid_node rclcpp nav_msgs geometry_msgs)
@@ -36,7 +41,7 @@ ament_target_dependencies(occupancy_grid_node rclcpp nav_msgs geometry_msgs)
 # Path Planner Node
 add_executable(path_planning_node src/path_planning/path_planning.cpp src/path_planning_node.cpp)
 ament_target_dependencies(path_planning_node rclcpp nav_msgs geometry_msgs)
-target_link_libraries(path_planning_node node_lib a_star rrt)
+target_link_libraries(path_planning_node node_lib a_star rrt rrt_a_star)
 
 install(TARGETS 
   occupancy_grid_node

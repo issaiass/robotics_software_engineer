@@ -1,8 +1,8 @@
 #include "path_planning/path_planning.hpp"
 #include "node/node_rrt.hpp"
-//#include "algo/grid_sweep.h"
 #include "algo/a_star.h"
 #include "algo/rrt.hpp"
+#include "algo/rrt_a_star.hpp"
 
 
 PathPlanning::PathPlanning() : Node("path_planning_node")
@@ -23,9 +23,8 @@ void PathPlanning::occupancyGridCallback(const nav_msgs::msg::OccupancyGrid &gri
   path_msg.header.stamp = grid.header.stamp;
 
   start_time_ = this->get_clock()->now();
-  path_msg.poses = rrt(grid); // a_star(grid); rrt(grid)
+  path_msg.poses = rrt_a_star(grid); // a_star(grid); rrt(grid); rrt_a_star(grid);
   rclcpp::Duration elapsed_time = this->get_clock()->now() - start_time_;
   RCLCPP_INFO(this->get_logger(), "Elapsed time: %.9f seconds", elapsed_time.seconds());
-  // call the planner
   path_publisher_->publish(path_msg);
 }
