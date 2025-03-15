@@ -23,6 +23,7 @@ void PathPlanning::occupancyGridCallback(const nav_msgs::msg::OccupancyGrid &gri
   path_msg.header.stamp = grid.header.stamp;
 
   start_time_ = this->get_clock()->now();
+ // Use RrtAStar path planning
   path_msg.poses = rrt_a_star(grid); // a_star(grid); rrt(grid); rrt_a_star(grid);
   rclcpp::Duration elapsed_time = this->get_clock()->now() - start_time_;
   RCLCPP_INFO(this->get_logger(), "Elapsed time: %.9f seconds", elapsed_time.seconds());
