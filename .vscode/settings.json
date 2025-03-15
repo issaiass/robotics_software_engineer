@@ -84,7 +84,10 @@
         "typeinfo": "cpp",
         "variant": "cpp",
         "core": "cpp",
-        "dense": "cpp"
+        "dense": "cpp",
+        "coroutine": "cpp",
+        "source_location": "cpp",
+        "*.ipp": "cpp"
     },
     "ros.distro": "humble"
 }

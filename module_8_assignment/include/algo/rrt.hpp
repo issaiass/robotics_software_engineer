@@ -7,6 +7,12 @@
 #include <random>
 #include "node/node_rrt.hpp"
 
+#include <rclcpp/rclcpp.hpp>
+#include <geometry_msgs/msg/point.hpp>
+#include <geometry_msgs/msg/pose_stamped.hpp>
+#include <nav_msgs/msg/path.hpp>
+#include <nav_msgs/msg/occupancy_grid.hpp>
+
 
 class RRT_Planner {
   public:
@@ -42,5 +48,6 @@ class RRT_Planner {
 
 };
 
+std::vector<geometry_msgs::msg::PoseStamped> rrt(const nav_msgs::msg::OccupancyGrid& grid);
 
 #endif // RRT_HPP

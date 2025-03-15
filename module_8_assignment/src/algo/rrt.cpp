@@ -131,3 +131,38 @@ std::vector<Node_RRT> RRT_Planner::planPath(Node_RRT const &start, Node_RRT cons
 
     return path;
 }
+
+
+
+std::vector<geometry_msgs::msg::PoseStamped> rrt(const nav_msgs::msg::OccupancyGrid& grid) {
+  RCLCPP_DEBUG(rclcpp::get_logger("RRT_Planner"), "Initializing RRT Planner");
+
+  nav_msgs::msg::Path path_msg;
+  path_msg.header.frame_id = grid.header.frame_id;
+  path_msg.header.stamp = grid.header.stamp;
+    
+  RRT_Planner planner;
+  std::vector<int> domain(grid.data.begin(), grid.data.end());
+  planner.setDomain(domain);
+  
+  Node_RRT start(0, 0);
+  Node_RRT goal(7, 7);
+  std::vector<Node_RRT> path = planner.planPath(start, goal);
+
+  RCLCPP_INFO(rclcpp::get_logger("RRT_Planner"), "Path Planning from (%d, %d) to (%d, %d)", start.getX(), start.getY(), goal.getX(), goal.getY());
+  if (path.empty())
+  {
+    RCLCPP_WARN(rclcpp::get_logger("RRT_Planner"), "No path found");
+  } else {
+    for (auto &node : path)
+    {
+      RCLCPP_INFO(rclcpp::get_logger("RRT_Planner"), "Path node: (%d, %d)", node.getX(), node.getY());
+      geometry_msgs::msg::PoseStamped pose;
+      pose.pose.position.x = node.getX() - 5.0;
+      pose.pose.position.y = node.getY() - 5.0;
+      pose.pose.position.z = 0.0;
+      path_msg.poses.push_back(pose);
+    }
+  }
+  return path_msg.poses;
+}

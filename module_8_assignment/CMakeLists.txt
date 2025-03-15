@@ -26,7 +26,8 @@ ament_target_dependencies(a_star rclcpp geometry_msgs nav_msgs)
 
 # RRT Library
 add_library(rrt STATIC src/algo/rrt.cpp)
-
+ament_target_dependencies(rrt rclcpp nav_msgs geometry_msgs)
+target_link_libraries(rrt node_lib)
 
 # Occupancy Grid Node
 add_executable(occupancy_grid_node src/occupancy_grid/occupancy_grid.cpp src/occupancy_grid_node.cpp)
